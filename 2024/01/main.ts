@@ -7,26 +7,21 @@ const testData = `3   4
 3   9
 3   3`;
 
+const dataToArray = (data: string) => {
+  return data.split("\n").map((val) => val.split(/\s+/)); //Split by new line and then by whitespace
+};
+
 const getDistance = (data: string) => {
   let total = 0;
 
-  // 1. parse each line and split by white space
-  const input = data.split("\n");
-  const splitValues = input.map((val) => val.split(/\s+/));
+  const dataArray = dataToArray(data);
 
-  // 2. sort both array ascending
-  const firstArray = splitValues // Could be replace by a array.reduce
-    .map((val) => Number(val[0]))
-    .sort((a, b) => a - b);
-  const secondArray = splitValues
-    .map((val) => Number(val[1]))
-    .sort((a, b) => a - b);
+  const leftCol = dataArray.map((val) => Number(val[0])).sort((a, b) => a - b);
+  const rightCol = dataArray.map((val) => Number(val[1])).sort((a, b) => a - b);
 
-  // 3. get difference between 2 numbers
-  firstArray.forEach((num, index) => {
-    const comparedNum = secondArray[index];
+  leftCol.forEach((num, index) => {
+    const comparedNum = rightCol[index];
 
-    // 4. add differences together
     if (num < comparedNum) total += comparedNum - num;
     else total += num - comparedNum;
   });
@@ -34,5 +29,24 @@ const getDistance = (data: string) => {
   return total;
 };
 
+const getSimilarity = (data: string) => {
+  let total = 0;
+
+  const dataArray = dataToArray(data);
+
+  const leftCol = dataArray.map((val) => Number(val[0]));
+  const rightCol = dataArray.map((val) => Number(val[1]));
+
+  leftCol.forEach((num) => {
+    const count = rightCol.filter((x) => x === num).length;
+    total += num * count;
+  });
+
+  return total;
+};
+
 const distance = getDistance(data);
+const similarity = getSimilarity(data);
+
 console.log(distance);
+console.log(similarity);
