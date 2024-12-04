@@ -52,5 +52,53 @@ const getNbOfSafeReports = (data: string) => {
   return reports.length - unsafeReports;
 };
 
-const count = getNbOfSafeReports(data);
+const getNbOfSafeReportsDampened = (data: string): number => {
+  let unsafeReports = 0;
+  const reports = dataToArray(data);
+
+  for (let report of reports) {
+    const ascending = report[0] < report[1];
+    let violations = 0;
+    let index = 1;
+
+    while (index < report.length) {
+      const level = report[index];
+      const previousLevel = report[index - 1];
+
+      if (ascending) {
+        if (
+          level > previousLevel &&
+          level - previousLevel >= 1 &&
+          level - previousLevel <= 3
+        ) {
+          index++;
+          continue;
+        }
+      } else {
+        if (
+          level < previousLevel &&
+          previousLevel - level >= 1 &&
+          previousLevel - level <= 3
+        ) {
+          index++;
+          continue;
+        }
+      }
+
+      violations++;
+      if (violations > 1) {
+        unsafeReports++;
+        break;
+      }
+
+      // Remove the violating level
+      report.splice(index, 1);
+    }
+  }
+
+  return reports.length - unsafeReports;
+};
+
+// const count = getNbOfSafeReports(data);
+const count = getNbOfSafeReportsDampened(data);
 console.log(count);
