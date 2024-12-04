@@ -1,104 +1,82 @@
 import { data } from "./data.ts";
 
-const testData = `7 6 4 2 1
-1 2 7 8 9
-9 7 6 2 1
-1 3 2 4 5
-8 6 4 4 1
-1 3 6 7 9`;
+const testData = `80 80 82 85 88 89`;
 
 const dataToArray = (data: string) => {
   return data
     .split("\n")
-    .map((val) => val.split(/\s+/).map((num) => Number(num))); // Refactor this to be cleaner
+    .map((val) => val.split(/\s+/).map((num) => Number(num)));
 };
 
 const getNbOfSafeReports = (data: string) => {
-  let unsafeReports = 0;
+  let safeReports = 0;
 
   const reports = dataToArray(data);
 
   for (const report of reports) {
     const ascending = report[0] < report[1];
 
-    for (const [index, level] of report.entries()) {
-      if (index === 0) continue;
+    const passed = report.every((level, index) => {
+      if (index !== 0) {
+        const previousLevel = report[index - 1];
 
-      const previousLevel = report[index - 1];
-
-      if (ascending) {
-        if (
-          level > previousLevel &&
-          level - previousLevel >= 1 &&
-          level - previousLevel <= 3
-        ) {
-          continue;
-        }
-      } else {
-        if (
-          level < previousLevel &&
-          previousLevel - level >= 1 &&
-          previousLevel - level <= 3
-        ) {
-          continue;
-        }
+        return ascending
+          ? level > previousLevel &&
+              level - previousLevel >= 1 &&
+              level - previousLevel <= 3
+          : level < previousLevel &&
+              previousLevel - level >= 1 &&
+              previousLevel - level <= 3;
       }
 
-      unsafeReports++;
-      break;
-    }
+      return true;
+    });
+
+    if (passed) safeReports++;
   }
 
-  return reports.length - unsafeReports;
+  return safeReports;
 };
 
 const getNbOfSafeReportsDampened = (data: string): number => {
-  let unsafeReports = 0;
+  let safeReports = 0;
+
   const reports = dataToArray(data);
 
   for (let report of reports) {
-    const ascending = report[0] < report[1];
+    const ascending =
+      report[0] === report[1] ? report[1] < report[2] : report[0] < report[1];
     let violations = 0;
-    let index = 1;
 
+    let index = 1; // Start from the second element
     while (index < report.length) {
       const level = report[index];
       const previousLevel = report[index - 1];
 
-      if (ascending) {
-        if (
-          level > previousLevel &&
+      const isValid = ascending
+        ? level > previousLevel &&
           level - previousLevel >= 1 &&
           level - previousLevel <= 3
-        ) {
-          index++;
-          continue;
-        }
-      } else {
-        if (
-          level < previousLevel &&
+        : level < previousLevel &&
           previousLevel - level >= 1 &&
-          previousLevel - level <= 3
-        ) {
-          index++;
-          continue;
-        }
+          previousLevel - level <= 3;
+
+      if (!isValid) {
+        violations++;
+        if (violations > 1) break;
+        report.splice(index, 1);
+        continue;
       }
 
-      violations++;
-      if (violations > 1) {
-        unsafeReports++;
-        break;
-      }
-
-      // Remove the violating level
-      report.splice(index, 1);
+      index++;
     }
+
+    if (violations <= 1) safeReports++;
   }
 
-  return reports.length - unsafeReports;
+  return safeReports;
 };
 
-// const count = getNbOfSafeReports(data);
-const count = getNbOfSafeReportsDampened(data);
-console.log(count);
+const reportsCount = getNbOfSafeReports(data);
+const dampenedReportsCount = getNbOfSafeReportsDampened(data);
+console.log(dampenedReportsCount);
