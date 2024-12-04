@@ -11,6 +11,8 @@ SAXAMASAAA
 MAMMMXMMMM
 MXMXAXMASX`;
 
+const MAS = "MAS";
+const INVERTED_MAS = "SAM";
 const XMAS = "XMAS";
 const INVERTED_XMAS = "SAMX";
 
@@ -64,4 +66,39 @@ const part1 = (data: string) => {
   console.log(total);
 };
 
-part1(data);
+const part2 = (data: string) => {
+  let total = 0;
+  const dataArr = dataToArray(data);
+
+  for (let i = 0; i < dataArr.length; i++) {
+    const line = dataArr[i];
+    for (let j = 0; j < line.length; j++) {
+      let rightDiagonalMatch = false;
+      let leftDiagonalMatch = false;
+
+      // Check right diagonal
+      if (i + 2 < dataArr.length && j + 2 < line.length) {
+        const rightDiagonal =
+          dataArr[i][j] + dataArr[i + 1][j + 1] + dataArr[i + 2][j + 2];
+        if (rightDiagonal === MAS || rightDiagonal === INVERTED_MAS)
+          rightDiagonalMatch = true;
+      }
+
+      // Check left diagonal
+      if (i + 2 < dataArr.length && j + 2 < line.length) {
+        const leftDiagonal =
+          dataArr[i][j + 2] + dataArr[i + 1][j + 1] + dataArr[i + 2][j];
+        if (leftDiagonal === MAS || leftDiagonal === INVERTED_MAS)
+          leftDiagonalMatch = true;
+      }
+
+      if (rightDiagonalMatch && leftDiagonalMatch) {
+        total++;
+      }
+    }
+  }
+  console.log(total);
+};
+
+// part1(data);
+part2(data);
