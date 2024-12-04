@@ -8,7 +8,7 @@ const testData = `7 6 4 2 1
 1 3 6 7 9`;
 
 const dataToArray = (data: string) => {
-  return data.split("\n").map((val) => val.split(/\s+/)); // Refactor this to be cleaner
+  return data.split("\n").map((val) => val.split(/\s+/));
 };
 
 const getNbOfSafeReports = (data: string) => {
