@@ -8,9 +8,7 @@ const testData = `7 6 4 2 1
 1 3 6 7 9`;
 
 const dataToArray = (data: string) => {
-  return data
-    .split("\n")
-    .map((val) => val.split(/\s+/).map((num) => Number(num))); // Refactor this to be cleaner
+  return data.split("\n").map((val) => val.split(/\s+/)); // Refactor this to be cleaner
 };
 
 const getNbOfSafeReports = (data: string) => {
@@ -24,21 +22,22 @@ const getNbOfSafeReports = (data: string) => {
     for (const [index, level] of report.entries()) {
       if (index === 0) continue;
 
-      const previousLevel = report[index - 1];
+      const currLevel = Number(level);
+      const previousLevel = Number(report[index - 1]);
 
       if (ascending) {
         if (
-          level > previousLevel &&
-          level - previousLevel >= 1 &&
-          level - previousLevel <= 3
+          currLevel > previousLevel &&
+          currLevel - previousLevel >= 1 &&
+          currLevel - previousLevel <= 3
         ) {
           continue;
         }
       } else {
         if (
-          level < previousLevel &&
-          previousLevel - level >= 1 &&
-          previousLevel - level <= 3
+          currLevel < previousLevel &&
+          previousLevel - currLevel >= 1 &&
+          previousLevel - currLevel <= 3
         ) {
           continue;
         }
