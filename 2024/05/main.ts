@@ -33,11 +33,12 @@ const stringToArray = (data: string, splitter: string) => {
   return data.split("\n").map((val) => val.split(splitter).map(Number));
 };
 
+const orderArr = stringToArray(order, "|");
+const pagesArr = stringToArray(pages, ",");
+
 const part1 = () => {
   let total = 0;
-  // 1. for each pages, check if it contains one of the order
-  const orderArr = stringToArray(order, "|");
-  const pagesArr = stringToArray(pages, ",");
+  const failedPages: number[][] = [];
 
   for (const page of pagesArr) {
     let pageIsGood = true;
@@ -61,6 +62,7 @@ const part1 = () => {
             continue;
           } else {
             pageIsGood = false;
+            failedPages.push(page);
             break;
           }
         }
@@ -75,10 +77,56 @@ const part1 = () => {
     total += page[Math.ceil(page.length / 2) - 1];
   }
 
-  console.log(total);
+  return failedPages;
 };
 
-const part2 = () => {};
+const part2 = () => {
+  let total = 0;
+  const failedPages = part1();
+  const sortedPages = [...failedPages];
+
+  // change the order using the order above
+  for (const [pageIndex, page] of failedPages.entries()) {
+    for (const [numIndex, num] of page.entries()) {
+      for (const order of orderArr) {
+        const orderIndex = order.findIndex((ordNum) => ordNum === num);
+        if (orderIndex !== -1) {
+          const indexToCheck = orderIndex === 0 ? 1 : 0;
+          const secondNumIndex = page.findIndex(
+            (pageNum) => pageNum === order[indexToCheck]
+          );
+
+          // check if the the order is correct in the page
+          if (
+            secondNumIndex === -1 ||
+            (orderIndex === 0 && numIndex < secondNumIndex) ||
+            (orderIndex === 1 && numIndex > secondNumIndex)
+          ) {
+            continue;
+          } else {
+            // change the order to fit
+            if (orderIndex === 0) {
+              const [movedItem] = sortedPages[pageIndex].splice(numIndex, 1);
+              sortedPages[pageIndex].splice(secondNumIndex, 0, movedItem);
+            } else {
+              const [movedItem] = sortedPages[pageIndex].splice(
+                secondNumIndex,
+                1
+              );
+              sortedPages[pageIndex].splice(numIndex, 0, movedItem);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  for (const page of sortedPages) {
+    total += page[Math.floor(page.length / 2)];
+  }
+
+  console.log(total);
+};
 
 part1();
 part2();
