@@ -83,9 +83,7 @@ const part1 = () => {
 const part2 = () => {
   let total = 0;
   const failedPages = part1();
-  const sortedPages = [...failedPages];
 
-  // change the order using the order above
   for (const [pageIndex, page] of failedPages.entries()) {
     for (const [numIndex, num] of page.entries()) {
       for (const order of orderArr) {
@@ -96,7 +94,6 @@ const part2 = () => {
             (pageNum) => pageNum === order[indexToCheck]
           );
 
-          // check if the the order is correct in the page
           if (
             secondNumIndex === -1 ||
             (orderIndex === 0 && numIndex < secondNumIndex) ||
@@ -105,23 +102,19 @@ const part2 = () => {
             continue;
           } else {
             // change the order to fit
-            if (orderIndex === 0) {
-              const [movedItem] = sortedPages[pageIndex].splice(numIndex, 1);
-              sortedPages[pageIndex].splice(secondNumIndex, 0, movedItem);
-            } else {
-              const [movedItem] = sortedPages[pageIndex].splice(
-                secondNumIndex,
-                1
-              );
-              sortedPages[pageIndex].splice(numIndex, 0, movedItem);
-            }
+            const temp = failedPages[pageIndex][numIndex];
+
+            failedPages[pageIndex][numIndex] =
+              failedPages[pageIndex][secondNumIndex];
+            failedPages[pageIndex][secondNumIndex] = temp;
           }
         }
       }
     }
   }
 
-  for (const page of sortedPages) {
+  console.log(failedPages);
+  for (const page of failedPages) {
     total += page[Math.floor(page.length / 2)];
   }
 
