@@ -8,31 +8,45 @@ const dataToArray = (data: string) => {
     .map((val) => val.split(/\s+/).map((num) => Number(num)));
 };
 
+const isAscending = (arr: number[]): boolean => {
+  for (let i = 0; i < arr.length - 1; i++) {
+    if (arr[i] !== arr[i + 1]) {
+      return arr[i] < arr[i + 1];
+    }
+  }
+  // If all elements are equal or the array is empty/single-element, return true (considered ascending).
+  return true;
+};
+
+const isSafe = (report: number[]): boolean => {
+  const ascending = isAscending(report);
+
+  const passed = report.every((level, index) => {
+    if (index !== 0) {
+      const previousLevel = report[index - 1];
+
+      return ascending
+        ? level > previousLevel &&
+            level - previousLevel >= 1 &&
+            level - previousLevel <= 3
+        : level < previousLevel &&
+            previousLevel - level >= 1 &&
+            previousLevel - level <= 3;
+    }
+
+    return true;
+  });
+
+  return passed;
+};
+
 const getNbOfSafeReports = (data: string) => {
   let safeReports = 0;
 
   const reports = dataToArray(data);
 
   for (const report of reports) {
-    const ascending = report[0] < report[1];
-
-    const passed = report.every((level, index) => {
-      if (index !== 0) {
-        const previousLevel = report[index - 1];
-
-        return ascending
-          ? level > previousLevel &&
-              level - previousLevel >= 1 &&
-              level - previousLevel <= 3
-          : level < previousLevel &&
-              previousLevel - level >= 1 &&
-              previousLevel - level <= 3;
-      }
-
-      return true;
-    });
-
-    if (passed) safeReports++;
+    if (isSafe(report)) safeReports++;
   }
 
   return safeReports;
@@ -43,35 +57,20 @@ const getNbOfSafeReportsDampened = (data: string): number => {
 
   const reports = dataToArray(data);
 
-  for (let report of reports) {
-    const ascending =
-      report[0] === report[1] ? report[1] < report[2] : report[0] < report[1];
-    let violations = 0;
-
-    let index = 1; // Start from the second element
-    while (index < report.length) {
-      const level = report[index];
-      const previousLevel = report[index - 1];
-
-      const isValid = ascending
-        ? level > previousLevel &&
-          level - previousLevel >= 1 &&
-          level - previousLevel <= 3
-        : level < previousLevel &&
-          previousLevel - level >= 1 &&
-          previousLevel - level <= 3;
-
-      if (!isValid) {
-        violations++;
-        if (violations > 1) break;
-        report.splice(index, 1);
-        continue;
-      }
-
-      index++;
+  for (const report of reports) {
+    if (isSafe(report)) {
+      safeReports++;
+      continue;
     }
 
-    if (violations <= 1) safeReports++;
+    for (let i = 0; i < report.length; i++) {
+      const subReport = [...report];
+      subReport.splice(i, 1);
+      if (isSafe(subReport)) {
+        safeReports++;
+        break;
+      }
+    }
   }
 
   return safeReports;
