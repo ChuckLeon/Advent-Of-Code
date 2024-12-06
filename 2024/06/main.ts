@@ -44,10 +44,8 @@ const part1 = () => {
     }
   }
 
+  // 2. move the guard out
   while (searching) {
-    // todo: add check in else ifs to check if we are still inside the array
-
-    // 2. move the guard out
     switch (currentDirection) {
       case "^":
         if (guardPosition[0] - 1 < 0) {
