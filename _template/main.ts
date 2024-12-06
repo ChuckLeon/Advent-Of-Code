@@ -6,6 +6,10 @@ const dataToArray = (data: string) => {
   return data.split("\n").map((val) => val.split(""));
 };
 
-const part1 = (data: string) => {};
+const array = dataToArray(testData);
 
-const part2 = (data: string) => {};
+const part1 = () => {};
+const part2 = () => {};
+
+part1();
+part2();
