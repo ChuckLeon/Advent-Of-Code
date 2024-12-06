@@ -33,8 +33,8 @@ const stringToArray = (data: string, splitter: string) => {
   return data.split("\n").map((val) => val.split(splitter).map(Number));
 };
 
-const orderArr = stringToArray(order, "|");
-const pagesArr = stringToArray(pages, ",");
+const orderArr = stringToArray(testOrder, "|");
+const pagesArr = stringToArray(testPages, ",");
 
 const part1 = () => {
   let total = 0;
@@ -88,6 +88,7 @@ const part2 = () => {
     for (const [numIndex, num] of page.entries()) {
       for (const order of orderArr) {
         const orderIndex = order.findIndex((ordNum) => ordNum === num);
+
         if (orderIndex !== -1) {
           const indexToCheck = orderIndex === 0 ? 1 : 0;
           const secondNumIndex = page.findIndex(
@@ -104,6 +105,7 @@ const part2 = () => {
             // change the order to fit
             const temp = failedPages[pageIndex][numIndex];
 
+            // messing up and only changing to index 0 1 number
             failedPages[pageIndex][numIndex] =
               failedPages[pageIndex][secondNumIndex];
             failedPages[pageIndex][secondNumIndex] = temp;
@@ -121,5 +123,58 @@ const part2 = () => {
   console.log(total);
 };
 
-part1();
-part2();
+const part2V2 = () => {
+  let total = 0;
+  const failedPages = part1();
+  const masterOrder: number[] = [];
+
+  // create a masterArray that is all the orders in the correct big final order.
+  for (const order of orderArr) {
+    // adds to masterOrder
+    for (const num of order) {
+      if (!masterOrder.includes(num)) {
+        masterOrder.push(num);
+      }
+    }
+  }
+
+  for (const order of orderArr) {
+    // adds to masterOrder
+    for (const [index, num] of masterOrder.entries()) {
+      const numIndex = order.findIndex((ord) => ord === num);
+
+      // masterOrderNum is in the order
+      if (numIndex !== -1) {
+        const otherNumIndex = numIndex === 0 ? 1 : 0;
+        const secondNumIndex = masterOrder.findIndex(
+          (masterNum) => masterNum === order[otherNumIndex]
+        );
+
+        // Both order numbers are in the masterOrder
+        if (secondNumIndex !== -1) {
+          if (index > secondNumIndex) {
+            // change the order to fit
+            const temp = masterOrder[index];
+
+            masterOrder[index] = masterOrder[secondNumIndex];
+            masterOrder[secondNumIndex] = temp;
+          }
+        }
+      }
+    }
+  }
+
+  for (const page of failedPages) {
+    const comparedMasterOrder = [...masterOrder];
+
+    const set = new Set(page);
+    const newOrder = comparedMasterOrder.filter((num) => set.has(num));
+    total += newOrder[Math.floor(newOrder.length / 2)];
+  }
+
+  console.log(total);
+};
+
+// part1();
+// part2();
+part2V2();
