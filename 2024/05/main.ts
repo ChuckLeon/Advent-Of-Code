@@ -33,8 +33,8 @@ const stringToArray = (data: string, splitter: string) => {
   return data.split("\n").map((val) => val.split(splitter).map(Number));
 };
 
-const orderArr = stringToArray(testOrder, "|");
-const pagesArr = stringToArray(testPages, ",");
+const orderArr = stringToArray(order, "|");
+const pagesArr = stringToArray(pages, ",");
 
 const part1 = () => {
   let total = 0;
@@ -128,48 +128,35 @@ const part2V2 = () => {
   const failedPages = part1();
   const masterOrder: number[] = [];
 
-  // create a masterArray that is all the orders in the correct big final order.
-  for (const order of orderArr) {
-    // adds to masterOrder
-    for (const num of order) {
-      if (!masterOrder.includes(num)) {
-        masterOrder.push(num);
-      }
+  // Build masterOrder by respecting the order defined in orderArr
+  for (const [a, b] of orderArr) {
+    const aIndex = masterOrder.indexOf(a);
+    const bIndex = masterOrder.indexOf(b);
+
+    if (aIndex === -1 && bIndex === -1) {
+      // Both numbers are new; add them in order
+      masterOrder.push(a, b);
+    } else if (aIndex !== -1 && bIndex === -1) {
+      // a exists; insert b after a
+      masterOrder.splice(aIndex + 1, 0, b);
+    } else if (aIndex === -1 && bIndex !== -1) {
+      // b exists; insert a before b
+      masterOrder.splice(bIndex, 0, a);
+    } else if (aIndex > bIndex) {
+      // If a comes after b, swap them
+      masterOrder.splice(aIndex, 1);
+      masterOrder.splice(bIndex, 0, a);
     }
   }
 
-  for (const order of orderArr) {
-    // adds to masterOrder
-    for (const [index, num] of masterOrder.entries()) {
-      const numIndex = order.findIndex((ord) => ord === num);
-
-      // masterOrderNum is in the order
-      if (numIndex !== -1) {
-        const otherNumIndex = numIndex === 0 ? 1 : 0;
-        const secondNumIndex = masterOrder.findIndex(
-          (masterNum) => masterNum === order[otherNumIndex]
-        );
-
-        // Both order numbers are in the masterOrder
-        if (secondNumIndex !== -1) {
-          if (index > secondNumIndex) {
-            // change the order to fit
-            const temp = masterOrder[index];
-
-            masterOrder[index] = masterOrder[secondNumIndex];
-            masterOrder[secondNumIndex] = temp;
-          }
-        }
-      }
-    }
-  }
-
+  // Process failedPages based on masterOrder
   for (const page of failedPages) {
-    const comparedMasterOrder = [...masterOrder];
-
     const set = new Set(page);
-    const newOrder = comparedMasterOrder.filter((num) => set.has(num));
-    total += newOrder[Math.floor(newOrder.length / 2)];
+    const newOrder = masterOrder.filter((num) => set.has(num));
+
+    if (newOrder.length > 0) {
+      total += newOrder[Math.floor(newOrder.length / 2)];
+    }
   }
 
   console.log(total);
