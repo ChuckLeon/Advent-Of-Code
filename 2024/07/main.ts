@@ -19,7 +19,11 @@ const formattedEquations = equations
   .map((line) => line.map((num) => num.trim().split(" ")))
   .map((line) => [Number(...line[0]), line[1].map(Number)]);
 
-function matchTotal(total: number, numbers: number[]): boolean {
+function matchTotal(
+  total: number,
+  numbers: number[],
+  includeConcatenation?: boolean
+): boolean {
   // Helper function to recursively check possible operations
   const check = (current: number, index: number): boolean => {
     // If we've used all numbers, check if the result matches the total
@@ -31,12 +35,18 @@ function matchTotal(total: number, numbers: number[]): boolean {
     const nextNumber = numbers[index];
 
     // Try all four operations and recurse
-    return (
-      check(current + nextNumber, index + 1) || // Addition
-      check(current * nextNumber, index + 1) // Multiplication
-      // check(current - nextNumber, index + 1) || // Subtraction
-      // (nextNumber !== 0 && check(current / nextNumber, index + 1)) // Division (prevent divide by zero)
-    );
+    if (includeConcatenation) {
+      return (
+        check(current + nextNumber, index + 1) || // Addition
+        check(current * nextNumber, index + 1) || // Multiplication
+        check(Number(current.toString() + nextNumber.toString()), index + 1) //Concatenation
+      );
+    } else {
+      return (
+        check(current + nextNumber, index + 1) || // Addition
+        check(current * nextNumber, index + 1) // Multiplication
+      );
+    }
   };
 
   // Start recursion with the first number
@@ -60,7 +70,23 @@ const part1 = () => {
 
   console.log(total);
 };
-const part2 = () => {};
+const part2 = () => {
+  let total = 0;
+
+  //1. check if you can combine the right side of the array to make the first element
+  for (const line of formattedEquations) {
+    const sum = line[0];
+    const numbers = line[1];
+
+    if (Array.isArray(numbers) && !Array.isArray(sum)) {
+      if (matchTotal(sum, numbers, true)) {
+        total += sum;
+      }
+    }
+  }
+
+  console.log(total);
+};
 
 part1();
 part2();
