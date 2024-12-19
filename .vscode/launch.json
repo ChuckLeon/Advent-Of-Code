@@ -8,7 +8,7 @@
       "request": "launch",
       "name": "Launch Program",
       "type": "node",
-      "program": "${workspaceFolder}/2024/07/main.ts", // change path to debug the file you want
+      "program": "${workspaceFolder}/2024/09/main.ts", // change path to debug the file you want
       "cwd": "${workspaceFolder}",
       "env": {},
       "runtimeExecutable": "/Users/charlesheon/.deno/bin/deno",
